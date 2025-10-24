@@ -1,0 +1,1 @@
+Predicts whether gold price will go up or down tomorrow using technical indicators and XGBoost.
