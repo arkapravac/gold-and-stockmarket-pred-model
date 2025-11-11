@@ -2,6 +2,8 @@ Predicts whether gold price will go up or down tomorrow using technical indicato
 This Model is trained on the data from yfinance. Agey dekhi ki kora jai tar por README.md update debo.
 
 eta hoye jacche amar project structure
+
+
 model-gold-and-stock-market-prediction/
 │
 ├── main.py                       Tkinter GUI (user clicks → runs src/ scripts)
