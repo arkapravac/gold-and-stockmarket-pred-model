@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from ta.momentum import RSIIndicator
 from ta.trend import MACD
-from src import 00_config as cfg
+from src import config as cfg
 
 def add_features(name, save=True):
     raw_path = os.path.join(cfg.DATA_RAW, f"{name}_raw.csv")
