@@ -28,3 +28,18 @@ def plot_feature_importance(feature_names: list, importances: np.ndarray, save_p
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+def plot_time_series_comparison(df: pd.DataFrame, columns: list, title: str = "Time Series Comparison", save_path: str = None):
+    """Plot multiple time series on the same chart"""
+    plt.figure(figsize=(12, 6))
+    for col in columns:
+        if col in df.columns:
+            plt.plot(df.index, df[col], label=col, alpha=0.7)
+    
+    plt.title(title)
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.xticks(rotation=45)
+    
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
