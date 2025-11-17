@@ -19,8 +19,7 @@ def download_asset(ticker, name, start="2010-01-01", end="2025-10-23"):
         print(f"WARNING!! Unexpected column count: {n_cols}. Columns: {data.columns.tolist()}")
        
         pass
-    import yfinance as yf
-
+        
     csv_path = os.path.join(cfg.DATA_RAW, f"{name}_raw.csv")
     data.to_csv(csv_path)
     print(f"Saved to: {csv_path} | Shape: {data.shape}")
