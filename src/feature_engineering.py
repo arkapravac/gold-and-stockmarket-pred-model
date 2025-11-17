@@ -25,5 +25,9 @@ def add_features(name, save=True):
     df['SMA_50'] = df['Close'].rolling(50).mean()
     df['Volatility_10'] = df['Return'].rolling(10).std()
      # calendar
-    df['dow'] = df.index.dayofweek  # ✅ Now this will work
+    df['dow'] = df.index.dayofweek  
     df['month'] = df.index.month
+# lags
+    for i in range(1,6):
+        df[f'Return_lag_{i}'] = df['Return'].shift(i)
+        df[f'Vol_lag_{i}'] = df['Volume'].shift(i)
