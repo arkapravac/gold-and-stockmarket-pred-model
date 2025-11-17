@@ -39,3 +39,10 @@ def save_predictions(predictions: Dict, model_name: str, asset: str):
     
     with open(pred_dir / f"{model_name}_predictions.json", 'w') as f:
         json.dump(predictions, f)
+
+def load_feature_columns(asset: str) -> List[str]:
+    """Load the list of feature columns for an asset"""
+    import json
+    feature_file = cfg.DATA_PROCESSED / f"{asset}_feature_cols.json"
+    with open(feature_file, 'r') as f:
+        return json.load(f)
