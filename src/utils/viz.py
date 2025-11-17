@@ -43,3 +43,17 @@ def plot_time_series_comparison(df: pd.DataFrame, columns: list, title: str = "T
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
+def plot_bayesian_forecast(y_true: np.ndarray, y_pred_mean: np.ndarray, y_pred_lower: np.ndarray, y_pred_upper: np.ndarray, title: str = "Bayesian Forecast with Uncertainty", save_path: str = None):
+    """Plot Bayesian forecast with credible intervals"""
+    plt.figure(figsize=(12, 6))
+    plt.plot(y_true, label='Actual', color='black', linewidth=2)
+    plt.plot(y_pred_mean, label='Predicted Mean', color='blue', linewidth=2)
+    plt.fill_between(range(len(y_pred_mean)), y_pred_lower, y_pred_upper, color='blue', alpha=0.2, label='95% Credible Interval')
+    plt.title(title)
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
