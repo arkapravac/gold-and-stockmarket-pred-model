@@ -41,3 +41,12 @@ def add_features(name, save=True):
     if save:
         df.to_csv(features_path)
     feature_cols = [c for c in df.columns if c not in ['Close_next','Target_dir']]
+# save feature list
+    with open(os.path.join(cfg.DATA_PROCESSED, f"{name}_feature_cols.json"), "w") as f:
+        json.dump(feature_cols, f)
+    print("Saved", features_path, "shape", df.shape)
+    return df
+
+if __name__ == "__main__":
+    add_features("gold")
+    add_features("stock")
