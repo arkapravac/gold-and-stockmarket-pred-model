@@ -16,3 +16,15 @@ def plot_predictions(y_true: np.ndarray, y_pred: np.ndarray, title: str = "Predi
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+def plot_feature_importance(feature_names: list, importances: np.ndarray, save_path: str = None):
+    """Plot feature importance"""
+    plt.figure(figsize=(10, 6))
+    indices = np.argsort(importances)[::-1]
+    plt.bar(range(len(importances)), importances[indices])
+    plt.xticks(range(len(importances)), [feature_names[i] for i in indices], rotation=45, ha='right')
+    plt.title('Feature Importance')
+    plt.tight_layout()
+    
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
