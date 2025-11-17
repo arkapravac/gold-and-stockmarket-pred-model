@@ -62,3 +62,29 @@ def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_pred_class: np.n
                 metrics['auc_roc'] = roc_auc_score(y_true_binary, y_pred_class_trimmed)
     
     return metrics
+def calculate_bayesian_metrics(posterior_samples: np.ndarray, y_true: np.ndarray) -> Dict[str, float]:
+    """Calculate metrics for Bayesian model predictions (posterior samples)"""
+    # Calculate mean prediction from posterior samples
+    y_pred_mean = np.mean(posterior_samples, axis=0)
+    
+    # Calculate credible intervals (5th and 95th percentiles)
+    lower_bound = np.percentile(posterior_samples, 5, axis=0)
+    upper_bound = np.percentile(posterior_samples, 95, axis=0)
+    
+    # Coverage probability (how often true value falls within credible interval)
+    coverage = np.mean((y_true >= lower_bound) & (y_true <= upper_bound))
+    
+    # Calculate metrics
+    metrics = calculate_metrics(y_true, y_pred_mean)
+    metrics['credible_interval_coverage'] = coverage
+    metrics['prediction_std'] = np.std(posterior_samples, axis=0).mean()
+    
+    return metrics
+
+def information_ratio(returns: np.ndarray, benchmark_returns: np.ndarray) -> float:
+    """Calculate Information Ratio"""
+    if len(returns) == 0 or len(benchmark_returns) == 0:
+        return 0.0
+    
+    excess_returns = returns - benchmark_returns[:len(returns)]
+    return np.mean(excess_returns) / np.std(excess_returns) if np.std(excess_returns) != 0 else 0.0
