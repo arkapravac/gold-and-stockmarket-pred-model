@@ -31,3 +31,13 @@ def add_features(name, save=True):
     for i in range(1,6):
         df[f'Return_lag_{i}'] = df['Return'].shift(i)
         df[f'Vol_lag_{i}'] = df['Volume'].shift(i)
+# targets: regression and classification
+    df['Close_next'] = df['Close'].shift(-1)
+    df['Target_dir'] = (df['Close_next'] > df['Close']).astype(int)
+
+    df = df.dropna()
+    features_path = os.path.join(cfg.DATA_PROCESSED, f"{name}_features.csv")
+    os.makedirs(cfg.DATA_PROCESSED, exist_ok=True)
+    if save:
+        df.to_csv(features_path)
+    feature_cols = [c for c in df.columns if c not in ['Close_next','Target_dir']]
