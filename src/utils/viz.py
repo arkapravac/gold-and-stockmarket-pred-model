@@ -57,3 +57,14 @@ def plot_bayesian_forecast(y_true: np.ndarray, y_pred_mean: np.ndarray, y_pred_l
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+
+def plot_correlation_matrix(df: pd.DataFrame, save_path: str = None):
+    """Plot correlation matrix of features"""
+    plt.figure(figsize=(12, 10))
+    correlation_matrix = df.corr()
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0, square=True)
+    plt.title('Feature Correlation Matrix')
+    
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
