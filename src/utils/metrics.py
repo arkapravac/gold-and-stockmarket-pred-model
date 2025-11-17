@@ -32,3 +32,33 @@ def max_drawdown(returns: np.ndarray) -> float:
     running_max = np.maximum.accumulate(cumulative)
     drawdown = (cumulative - running_max) / running_max
     return np.min(drawdown)
+def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_pred_class: np.ndarray = None) -> Dict[str, float]:
+    """Calculate comprehensive metrics"""
+    metrics = {}
+    
+    # Ensure arrays are the same length
+    min_len = min(len(y_true), len(y_pred))
+    y_true = y_true[:min_len]
+    y_pred = y_pred[:min_len]
+    
+    # Regression metrics
+    metrics['mae'] = mean_absolute_error(y_true, y_pred)
+    metrics['rmse'] = np.sqrt(mean_squared_error(y_true, y_pred))
+    metrics['mape'] = np.mean(np.abs((y_true - y_pred) / y_true)) * 100 if np.all(y_true != 0) else float('inf')
+    
+    # Directional metrics
+    metrics['directional_accuracy'] = directional_accuracy(y_true, y_pred)
+    
+    # If classification predictions are provided
+    if y_pred_class is not None and len(y_pred_class) > 0:
+        # Create binary true direction
+        y_true_binary = (y_true[1:] - y_true[:-1]) > 0
+        y_pred_class_trimmed = y_pred_class[:len(y_true_binary)]
+        
+        if len(y_true_binary) == len(y_pred_class_trimmed):
+            metrics['classification_accuracy'] = accuracy_score(y_true_binary, y_pred_class_trimmed)
+            metrics['f1_score'] = f1_score(y_true_binary, y_pred_class_trimmed, zero_division=0)
+            if len(np.unique(y_true_binary)) > 1:  # Only if we have both classes
+                metrics['auc_roc'] = roc_auc_score(y_true_binary, y_pred_class_trimmed)
+    
+    return metrics
