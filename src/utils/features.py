@@ -42,3 +42,23 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df['ATR'] = tr.rolling(14).mean()
     
     return df
+
+def get_feature_columns(df: pd.DataFrame, exclude_cols: List[str] = None) -> List[str]:
+    """Get list of feature columns (excluding targets and datetime features)"""
+    if exclude_cols is None:
+        exclude_cols = ['Close_next', 'Target_dir']
+    
+    return [col for col in df.columns if col not in exclude_cols]
+
+def add_lagged_features(df: pd.DataFrame, lags: int = 5) -> pd.DataFrame:
+    """Add lagged versions of key features"""
+    for i in range(1, lags + 1):
+        df[f'Return_lag_{i}'] = df['Return'].shift(i)
+        df[f'Volume_lag_{i}'] = df['Volume'].shift(i)
+        df[f'Close_lag_{i}'] = df['Close'].shift(i)
+        df[f'High_lag_{i}'] = df['High'].shift(i)
+        df[f'Low_lag_{i}'] = df['Low'].shift(i)
+    
+    return df
+
+
