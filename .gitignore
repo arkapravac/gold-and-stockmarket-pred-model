@@ -1,1 +1,4 @@
-data/*.scv
+data/*.csv
+data/gold_raw.csv
+data/stock_raw.csv
+src/__pycache__
