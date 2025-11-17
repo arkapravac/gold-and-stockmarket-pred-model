@@ -31,4 +31,11 @@ def validate_features(df: pd.DataFrame, required_features: List[str]) -> bool:
         print(f"Missing features: {missing}")
         return False
     return True
-
+def save_predictions(predictions: Dict, model_name: str, asset: str):
+    """Save predictions to results directory"""
+    import json
+    pred_dir = cfg.PREDICTIONS_DIR / asset
+    pred_dir.mkdir(parents=True, exist_ok=True)
+    
+    with open(pred_dir / f"{model_name}_predictions.json", 'w') as f:
+        json.dump(predictions, f)
