@@ -5,20 +5,10 @@ import numpy as np
 from ta.momentum import RSIIndicator
 from ta.trend import MACD
 import config as cfg
-import config as cfg
 
 def add_features(name, save=True):
     raw_path = os.path.join(cfg.DATA_RAW, f"{name}_raw.csv")
     df = pd.read_csv(raw_path, parse_dates=True, index_col=0)
-    
-    
-    df.index = pd.to_datetime(df.index)
-    
-    ohlcv = ['Open','High','Low','Close','Volume']
-def add_features(name, save=True):
-    raw_path = os.path.join(cfg.DATA_RAW, f"{name}_raw.csv")
-    df = pd.read_csv(raw_path, parse_dates=True, index_col=0)
-    
     
     df.index = pd.to_datetime(df.index)
     
@@ -26,9 +16,7 @@ def add_features(name, save=True):
     df[ohlcv] = df[ohlcv].apply(pd.to_numeric, errors='coerce')
     df = df.dropna(subset=ohlcv)
     # basic features
-    # basic features
     df['Return'] = df['Close'].pct_change()
-    df['High_Low_Pct'] = (df['High'] - df['Low'])/df['Close']
     df['High_Low_Pct'] = (df['High'] - df['Low'])/df['Close']
     df['Price_Change'] = df['Close'] - df['Open']
     df['RSI'] = RSIIndicator(df['Close']).rsi()
