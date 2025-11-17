@@ -17,3 +17,18 @@ def directional_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
         y_pred_dir = y_pred_dir[:min_len]
     
     return accuracy_score(y_true_dir, y_pred_dir)
+def sharpe_ratio(returns: np.ndarray, risk_free_rate: float = 0.02) -> float:
+    """Calculate Sharpe ratio"""
+    if len(returns) == 0:
+        return 0.0
+    excess_returns = returns - risk_free_rate / 252  # Daily risk free rate
+    return (np.mean(excess_returns) / np.std(excess_returns)) * np.sqrt(252) if np.std(excess_returns) != 0 else 0.0
+
+def max_drawdown(returns: np.ndarray) -> float:
+    """Calculate maximum drawdown"""
+    if len(returns) == 0:
+        return 0.0
+    cumulative = np.cumprod(1 + returns)
+    running_max = np.maximum.accumulate(cumulative)
+    drawdown = (cumulative - running_max) / running_max
+    return np.min(drawdown)
