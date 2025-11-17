@@ -68,3 +68,26 @@ def plot_correlation_matrix(df: pd.DataFrame, save_path: str = None):
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
+def plot_model_comparison(metrics_df: pd.DataFrame, metric: str = 'mae', save_path: str = None):
+    """Plot comparison of different models based on a metric"""
+    plt.figure(figsize=(10, 6))
+    models = metrics_df['model']
+    values = metrics_df[metric]
+    
+    plt.bar(models, values)
+    plt.title(f'Model Comparison - {metric.upper()}')
+    plt.ylabel(metric.upper())
+    plt.xticks(rotation=45, ha='right')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
+
+def save_plot(plt_obj, filename: str, asset: str):
+    """Save plot to results directory"""
+    plot_dir = cfg.PLOTS_DIR / asset
+    plot_dir.mkdir(parents=True, exist_ok=True)
+    plt_obj.savefig(plot_dir / filename, dpi=300, bbox_inches='tight')
+    plt_obj.close()
