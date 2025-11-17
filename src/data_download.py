@@ -25,3 +25,12 @@ def download_asset(ticker, name, start="2010-01-01", end="2025-10-23"):
     data.to_csv(csv_path)
     print(f"Saved to: {csv_path} | Shape: {data.shape}")
     
+if __name__ == "__main__":
+    # Clear existing raw files first
+    import shutil
+    if cfg.DATA_RAW.exists():
+        shutil.rmtree(cfg.DATA_RAW)
+    cfg.DATA_RAW.mkdir(parents=True, exist_ok=True)
+    
+    download_asset("GC=F", "gold")    
+    download_asset("SPY", "stock")    
