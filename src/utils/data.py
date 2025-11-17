@@ -13,3 +13,14 @@ def load_data(asset: str, data_type: str = "processed") -> pd.DataFrame:
         path = cfg.DATA_PROCESSED / f"{asset}_features.csv"
      df = pd.read_csv(path, parse_dates=True, index_col=0)
     return df
+def split_data(df: pd.DataFrame, test_size: float = 0.2, val_size: float = 0.1) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Chronological split: train, validation, test"""
+    n = len(df)
+    test_start = int(n * (1 - test_size))
+    val_start = int(n * (1 - test_size - val_size))
+    
+    train = df.iloc[:val_start]
+    val = df.iloc[val_start:test_start]
+    test = df.iloc[test_start:]
+    
+    return train, val, test
