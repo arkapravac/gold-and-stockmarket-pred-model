@@ -60,5 +60,19 @@ def add_lagged_features(df: pd.DataFrame, lags: int = 5) -> pd.DataFrame:
         df[f'Low_lag_{i}'] = df['Low'].shift(i)
     
     return df
-
+ def add_calendar_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Add calendar-based features"""
+    df['dow'] = df.index.dayofweek  # 0=Monday, 6=Sunday
+    df['month'] = df.index.month
+    df['quarter'] = df.index.quarter
+    df['day_of_year'] = df.index.dayofyear
+    df['is_weekend'] = (df.index.dayofweek >= 5).astype(int)
+    
+    # Business day features
+    df['is_month_start'] = df.index.is_month_start.astype(int)
+    df['is_month_end'] = df.index.is_month_end.astype(int)
+    df['is_quarter_start'] = df.index.is_quarter_start.astype(int)
+    df['is_quarter_end'] = df.index.is_quarter_end.astype(int)
+    
+    return df
 
