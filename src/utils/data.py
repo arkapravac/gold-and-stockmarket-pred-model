@@ -24,3 +24,11 @@ def split_data(df: pd.DataFrame, test_size: float = 0.2, val_size: float = 0.1) 
     test = df.iloc[test_start:]
     
     return train, val, test
+def validate_features(df: pd.DataFrame, required_features: List[str]) -> bool:
+    """Validate that all required features are present"""
+    missing = [f for f in required_features if f not in df.columns]
+    if missing:
+        print(f"Missing features: {missing}")
+        return False
+    return True
+
