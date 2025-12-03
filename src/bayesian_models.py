@@ -143,4 +143,8 @@ def run_bayesian_model(asset: str):
     return model, metrics, predictions
 
 
-
+if __name__ == "__main__":
+    print("Running Stable Bayesian Models...")
+    gold_model, gold_metrics, gold_predictions = run_bayesian_model("gold")
+    stock_model, stock_metrics, stock_predictions = run_bayesian_model("stock")
+    print("\n🎉 Pipeline complete.")
