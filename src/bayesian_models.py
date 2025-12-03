@@ -120,4 +120,27 @@ class BayesianTimeSeriesModel:
                               save_path=save_path)
 
 def run_bayesian_model(asset: str):
+    print(f"\nStarting Bayesian analysis for {asset.upper()}")
+    model = BayesianTimeSeriesModel(asset)
+    model.prepare_data()
+    model.fit()
+    metrics, predictions = model.evaluate()
+    
+    # Save results
+    cfg.PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+    plot_path = cfg.PLOTS_DIR / f"bayesian_forecast_{asset}.png"
+    model.plot_results(save_path=str(plot_path))
+    
+    pred_dir = cfg.PREDICTIONS_DIR / asset
+    pred_dir.mkdir(parents=True, exist_ok=True)
+    np.save(pred_dir / f"bayesian_samples_{asset}.npy", predictions['samples'])
+    
+    cfg.METRICS_DIR.mkdir(parents=True, exist_ok=True)
+    with open(cfg.METRICS_DIR / f"bayesian_metrics_{asset}.json", 'w') as f:
+        json.dump(metrics, f, indent=2)
+    
+    print(f"✅ Bayesian model for {asset} completed!")
+    return model, metrics, predictions
+
+
 
