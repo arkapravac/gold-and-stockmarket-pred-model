@@ -1,13 +1,16 @@
 # src/ml_models.py
+import sys
+import os
+# Add PROJECT ROOT (parent of src/) to Python path FIRST
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+# NOW imports will work
+import config as cfg
+from src.utils.data import load_data, load_feature_columns
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from sklearn.svm import SVR
 import numpy as np
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import config as cfg
-from src.utils.data import load_data, load_feature_columns
 
 def train_ml_models(asset="gold"):
     # Load same 5 features as Bayesian model
