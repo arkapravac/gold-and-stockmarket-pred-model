@@ -85,21 +85,25 @@ class BayesianTimeSeriesModel:
     def predict(self, X_test=None):
         if X_test is None:
             X_test, _ = self.test_data
-        
+
+        # Extract posterior samples
         beta_samples = self.idata.posterior['beta'].values
         alpha_samples = self.idata.posterior['alpha'].values
-        
+        sigma_samples = self.idata.posterior['sigma'].values  # added for noise
+
         beta_flat = beta_samples.reshape(-1, beta_samples.shape[-1])
         alpha_flat = alpha_samples.flatten()
-        
-        y_pred = alpha_flat[:, None] + np.dot(beta_flat, X_test.T)
+        sigma_flat = sigma_samples.flatten()
+
+        mu_pred = alpha_flat[:, None] + np.dot(beta_flat, X_test.T)
+        y_pred = mu_pred + np.random.normal(0, sigma_flat[:, None], size=mu_pred.shape)
+
         y_pred = np.nan_to_num(y_pred, nan=0.0, posinf=0.0, neginf=0.0)
         historical_max = np.max(self.train_data[1])
         y_pred = np.clip(y_pred, 0, historical_max * 10)
-        
+
         return y_pred
 
-    
     def evaluate(self):
         _, y_test = self.test_data
         y_pred_samples = self.predict()
@@ -121,30 +125,51 @@ class BayesianTimeSeriesModel:
 
 def run_bayesian_model(asset: str):
     print(f"\nStarting Bayesian analysis for {asset.upper()}")
-    model = BayesianTimeSeriesModel(asset)
-    model.prepare_data()
-    model.fit()
-    metrics, predictions = model.evaluate()
-    
-    # Save results
-    cfg.PLOTS_DIR.mkdir(parents=True, exist_ok=True)
-    plot_path = cfg.PLOTS_DIR / f"bayesian_forecast_{asset}.png"
-    model.plot_results(save_path=str(plot_path))
-    
-    pred_dir = cfg.PREDICTIONS_DIR / asset
-    pred_dir.mkdir(parents=True, exist_ok=True)
-    np.save(pred_dir / f"bayesian_samples_{asset}.npy", predictions['samples'])
-    
-    cfg.METRICS_DIR.mkdir(parents=True, exist_ok=True)
-    with open(cfg.METRICS_DIR / f"bayesian_metrics_{asset}.json", 'w') as f:
-        json.dump(metrics, f, indent=2)
-    
-    print(f"✅ Bayesian model for {asset} completed!")
-    return model, metrics, predictions
+    try:
+        model = BayesianTimeSeriesModel(asset)
+        model.prepare_data()
+        model.fit()
+        metrics, predictions = model.evaluate()
 
+        # Save results (ALWAYS run this, even if metrics are bad)
+        cfg.PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+        pred_dir = cfg.PREDICTIONS_DIR / asset
+        pred_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Save predictions FIRST (before anything else)
+        np.save(pred_dir / f"bayesian_samples_{asset}.npy", predictions['samples'])
+        np.save(pred_dir / "bayesian_pred.npy", np.mean(predictions['samples'], axis=0))
+        
+        # Save plot
+        plot_path = cfg.PLOTS_DIR / f"bayesian_forecast_{asset}.png"
+        model.plot_results(save_path=str(plot_path))
+        
+        # Save metrics LAST
+        cfg.METRICS_DIR.mkdir(parents=True, exist_ok=True)
+        with open(cfg.METRICS_DIR / f"bayesian_metrics_{asset}.json", 'w') as f:
+            json.dump(metrics, f, indent=2)
+
+        print(f"✅ Bayesian model for {asset} completed!")
+        return model, metrics, predictions
+
+    except Exception as e:
+        print(f"❌ Bayesian model failed during evaluation: {e}")
+        # Still save samples if they exist
+        if hasattr(model, 'idata') and model.idata is not None:
+            try:
+                # Generate predictions manually
+                X_test, _ = model.test_data
+                y_pred_samples = model.predict(X_test)
+                pred_dir = cfg.PREDICTIONS_DIR / asset
+                pred_dir.mkdir(parents=True, exist_ok=True)
+                np.save(pred_dir / f"bayesian_samples_{asset}_emergency.npy", y_pred_samples)
+                print("⚠️ Emergency save completed")
+            except Exception as e2:
+                print(f"Emergency save also failed: {e2}")
+        raise
 
 if __name__ == "__main__":
     print("Running Stable Bayesian Models...")
     gold_model, gold_metrics, gold_predictions = run_bayesian_model("gold")
     stock_model, stock_metrics, stock_predictions = run_bayesian_model("stock")
-    print("\n🎉 Pipeline complete.")
+    print("\n Pipeline complete.")
